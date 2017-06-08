@@ -67,8 +67,20 @@ public class GithubProfileScraper extends AbstractAPIHandler implements APIHandl
 
     public JSONObject serviceImpl(Query call, HttpServletResponse response, Authorization rights, JSONObjectWithDefault permissions)
             throws APIException {
-        String profile = call.get("profile", "");
-        String termsParam = call.get("terms", "");
+    	
+		if(call.get("profile", null) == null) {
+			throw new APIException(400, "profile empty");
+		}
+		
+		String profile = call.get("profile", "");
+		String termsParam = call.get("terms", "");
+		
+		// check profile name pattern
+		Pattern pattern = Pattern.compile(".+");
+		if (!pattern.matcher(profile).matches()) {
+			throw new APIException(400, "no valid profile name");
+		}
+
         Set terms = null;
         if  (!"".equals(termsParam)) {
             terms = new HashSet(Arrays.asList(termsParam.split(",")));
